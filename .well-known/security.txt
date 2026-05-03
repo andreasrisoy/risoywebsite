@@ -1,5 +1,5 @@
 Contact: mailto:secure@risoy.io
 Expires: 2027-01-01T00:00:00.000Z
 Preferred-Languages: en
-Canonical: [https://risoy.io/.well-known/security.txt](https://risoy.io/.well-known/security.txt)
-Encryption: [https://risoy.io/.well-known/risoy.asc](https://risoy.io/.well-known/risoy.asc)
+Canonical: https://risoy.io/.well-known/security.txt
+Encryption: https://risoy.io/.well-known/risoy.asc
