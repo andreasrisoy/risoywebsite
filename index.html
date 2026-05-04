@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
+    
+    <!-- Social Link Previews (Open Graph) -->
+    <meta property="og:title" content="risoy.io">
+    <meta property="og:description" content="Security & Privacy Research. Verified Identity.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://risoy.io">
+    
     <title>risoy.io</title>
+
     <!-- Inline SVG Favicon (Shield Icon) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+    
     <style>
         :root {
             --bg: #0a0a0a;
             --text: #d1d1d1;
-            --accent: #00ff41; /* Classic Terminal Green */
+            --accent: #00ff41; /* Terminal Green */
             --dim: #555;
         }
+
         body { 
             background: var(--bg); 
             color: var(--text); 
@@ -21,35 +31,75 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            height: 100vh; 
+            min-height: 100vh; /* Better for mobile than height: 100vh */
             margin: 0; 
+            padding: 20px;
+            box-sizing: border-box;
         }
+
         .card { 
-            max-width: 400px;
+            width: 100%;
+            max-width: 450px;
             padding: 2rem;
             border-left: 1px solid var(--dim);
+            animation: fadeIn 0.8s ease-out;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         h1 { 
             font-size: 1.5rem; 
-            margin-bottom: 0.5rem; 
+            margin: 0 0 0.5rem 0; 
             letter-spacing: -1px;
+            color: #fff;
         }
-        p { line-height: 1.6; margin: 0.5rem 0; }
-        a { color: var(--accent); text-decoration: none; transition: opacity 0.2s; }
-        a:hover { opacity: 0.7; }
+
+        p { line-height: 1.6; margin: 0.8rem 0; }
+        
+        a { 
+            color: var(--accent); 
+            text-decoration: none; 
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        a:hover { 
+            border-bottom: 1px solid var(--accent);
+            opacity: 0.8;
+        }
+
         .verification {
             margin-top: 1.5rem;
             padding-top: 1rem;
             border-top: 1px dashed var(--dim);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--dim);
-            word-break: break-all;
         }
+
+        .fingerprint {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text);
+            opacity: 0.6;
+        }
+
         .dim-text { color: var(--dim); }
+
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .card { padding: 1rem; }
+            h1 { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="card">
+    <main class="card">
         <h1>risoy.io</h1>
         <p>Security & Privacy Research</p>
         
@@ -60,14 +110,16 @@
         </p>
 
         <div class="verification">
-            <span class="dim-text">PGP FINGERPRINT</span><br>
-            <!-- Replace the text below with your actual Fingerprint from Proton -->
-            e8c18510d29bd842d19d95a4ef2fbe81b750fa80
+            <span class="dim-text">PGP FINGERPRINT</span>
+            <code class="fingerprint">
+                E8C1 8510 D29B D842 D19D<br>
+                95A4 EF2F BE81 B750 FA80
+            </code>
         </div>
         
-        <p class="dim-text" style="font-size: 0.7rem; margin-top: 2rem;">
-            No tracking. No analytics. Verified identity.
+        <p class="dim-text" style="font-size: 0.7rem; margin-top: 2.5rem;">
+            No tracking. No analytics. Identity verified via DNSSEC.
         </p>
-    </div>
+    </main>
 </body>
 </html>
