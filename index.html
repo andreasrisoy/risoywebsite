@@ -1,28 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
-
-    
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     <title>risoy.io</title>
+    <!-- Inline SVG Favicon (Shield Icon) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     <style>
-        body { background: #0f0f0f; color: #e0e0e0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { text-align: left; border-left: 2px solid #333; padding-left: 20px; }
-        a { color: #00ff41; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .dim { color: #666; }
+        :root {
+            --bg: #0a0a0a;
+            --text: #d1d1d1;
+            --accent: #00ff41; /* Classic Terminal Green */
+            --dim: #555;
+        }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", "Droid Sans Mono", monospace;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .card { 
+            max-width: 400px;
+            padding: 2rem;
+            border-left: 1px solid var(--dim);
+        }
+        h1 { 
+            font-size: 1.5rem; 
+            margin-bottom: 0.5rem; 
+            letter-spacing: -1px;
+        }
+        p { line-height: 1.6; margin: 0.5rem 0; }
+        a { color: var(--accent); text-decoration: none; transition: opacity 0.2s; }
+        a:hover { opacity: 0.7; }
+        .verification {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--dim);
+            font-size: 0.75rem;
+            color: var(--dim);
+            word-break: break-all;
+        }
+        .dim-text { color: var(--dim); }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>risoy.io</h1>
         <p>Security & Privacy Research</p>
-        <p class="dim">---</p>
-        <p>Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a></p>
-        <p>Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a></p>
-        <p>Public Key: <a href="/.well-known/security.txt">security.txt</a></p>
-        <p class="dim" style="font-size: 0.8em;">No cookies. No tracking. Just data.</p>
+        
+        <p>
+            Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
+            Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
+            Policy: <a href="/.well-known/security.txt">security.txt</a>
+        </p>
+
+        <div class="verification">
+            <span class="dim-text">PGP FINGERPRINT</span><br>
+            <!-- Replace the text below with your actual Fingerprint from Proton -->
+            [PASTE_YOUR_FINGERPRINT_HERE]
+        </div>
+        
+        <p class="dim-text" style="font-size: 0.7rem; margin-top: 2rem;">
+            No tracking. No analytics. Verified identity.
+        </p>
     </div>
 </body>
 </html>
