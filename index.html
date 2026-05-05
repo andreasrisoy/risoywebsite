@@ -35,10 +35,9 @@
             margin: 0; 
             padding: 20px;
             box-sizing: border-box;
-            overflow: hidden; /* Forhindrer scroll-bars pga scanlines */
+            overflow: hidden;
         }
 
-        /* Scanline-effekt (CRT-følelse) */
         body::after {
             content: " ";
             display: block;
@@ -68,7 +67,6 @@
             display: inline-block;
         }
 
-        /* Blinkende markør */
         .cursor {
             display: inline-block;
             width: 8px;
@@ -98,6 +96,37 @@
             background: rgba(0, 255, 65, 0.1);
         }
 
+        /* --- INTERAKTIV DEL START --- */
+        #terminal-output {
+            margin-top: 1rem;
+            color: var(--accent);
+            font-size: 0.8rem;
+            min-height: 1.2em;
+        }
+
+        .input-line {
+            display: flex;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .input-line span {
+            color: var(--accent);
+            margin-right: 8px;
+            user-select: none;
+        }
+
+        #cmd-input {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+            width: 100%;
+        }
+        /* --- INTERAKTIV DEL SLUTT --- */
+
         .verification {
             margin-top: 1.5rem;
             padding-top: 1rem;
@@ -116,9 +145,6 @@
             opacity: 0.6;
         }
 
-        .dim-text { color: var(--dim); }
-
-        /* Metadata linje nederst */
         .status-line {
             margin-top: 2rem;
             font-size: 0.65rem;
@@ -127,7 +153,6 @@
             letter-spacing: 1px;
         }
 
-        /* Mobile adjustments */
         @media (max-width: 480px) {
             .card { padding: 1.5rem; }
             h1 { font-size: 1.2rem; }
@@ -135,18 +160,28 @@
     </style>
 </head>
 <body>
-    <main class="card">
+    <main class="card" id="main-content">
         <h1 id="typewriter"></h1><span class="cursor"></span>
-        <p class="dim-text">Security & Privacy Research</p>
+        <p class="dim-text" id="tagline">Security & Privacy Research</p>
         
-<p>
-    Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
-    Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
-    Policy: <a href="/.well-known/security.txt">security.txt</a><br>
-    vCard: <a href="/contact.vcf" download>Download Contact Card</a>
-</p>
+        <div id="links-section">
+            <p>
+                Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
+                Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
+                Policy: <a href="/.well-known/security.txt">security.txt</a>
+            </p>
+        </div>
 
-        <div class="verification">
+        <!-- Terminal Output -->
+        <div id="terminal-output"></div>
+
+        <!-- Terminal Input -->
+        <div class="input-line">
+            <span>&gt;</span>
+            <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus>
+        </div>
+
+        <div class="verification" id="pgp-box">
             <span class="dim-text">PGP FINGERPRINT</span>
             <code class="fingerprint">
                 E8C1 8510 D29B D842 D19D<br>
@@ -154,17 +189,13 @@
             </code>
         </div>
         
-        <p class="dim-text" style="font-size: 0.7rem; margin-top: 2.5rem;">
-            No tracking. No analytics. Identity verified via DNSSEC.
-        </p>
-
         <div class="status-line" id="status-display">
             System: Online | Deployment: Fetching...
         </div>
     </main>
 
     <script>
-        // 1. Skrive-effekt for overskrift
+        // 1. Skrive-effekt
         const text = "risoy.io";
         let i = 0;
         function typeWriter() {
@@ -175,7 +206,7 @@
             }
         }
 
-        // 2. Hente siste oppdatering fra GitHub
+        // 2. GitHub-status
         async function fetchLastUpdate() {
             const user = "andreasrisoy"; // BYTT UT DENNE!
             const repo = "risoy-website";
@@ -188,6 +219,46 @@
                 document.getElementById("status-display").innerHTML = `System: Online | Mode: Stealth`;
             }
         }
+
+        // 3. Terminal Kommandoer
+        const input = document.getElementById('cmd-input');
+        const output = document.getElementById('terminal-output');
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = input.value.toLowerCase().trim();
+                handleCommand(cmd);
+                input.value = '';
+            }
+        });
+
+        function handleCommand(cmd) {
+            let response = '';
+            
+            if (cmd === 'help') {
+                response = 'Available: whoami, clear, sudo, contact';
+            } else if (cmd === 'whoami') {
+                response = 'Andreas Risøy. Security enthusiast and PGP advocate.';
+            } else if (cmd === 'sudo') {
+                response = 'User is not in the sudoers file. This incident will be reported.';
+            } else if (cmd === 'contact') {
+                response = 'Direct line: secure@risoy.io';
+            } else if (cmd === 'clear') {
+                output.innerHTML = '';
+                return;
+            } else if (cmd === '') {
+                response = '';
+            } else {
+                response = `Command not found: ${cmd}`;
+            }
+
+            if (response) {
+                output.innerHTML = `<div><span style="color:var(--dim)">$ ${cmd}</span><br>${response}</div>`;
+            }
+        }
+
+        // Klikk hvor som helst for å fokusere input
+        document.addEventListener('click', () => input.focus());
 
         window.onload = () => {
             typeWriter();
