@@ -33,10 +33,9 @@
             margin: 0; 
             padding: 20px;
             box-sizing: border-box;
-            overflow: hidden; /* Holder regnet inne i vinduet */
+            overflow: hidden;
         }
 
-        /* Matrix Canvas - Ligger bak alt */
         #matrix-canvas {
             position: fixed;
             top: 0;
@@ -44,7 +43,7 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            display: none; /* Skjult helt til kommandoen kjøres */
+            display: none;
         }
 
         body::after {
@@ -64,7 +63,7 @@
             max-width: 450px;
             padding: 2rem;
             border-left: 1px solid var(--dim);
-            background: rgba(10, 10, 10, 0.9); /* Litt gjennomsiktig så man ser regnet bak */
+            background: rgba(10, 10, 10, 0.9);
             position: relative;
             z-index: 10;
         }
@@ -184,7 +183,7 @@
                 Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
                 Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
                 Policy: <a href="/.well-known/security.txt">security.txt</a><br>
-                vCard: <a href="/contact.vcf" download>Download Business Card</a>
+                vCard: <a href="/contact.vcf" download>vCard</a>
             </p>
         </div>
 
@@ -243,7 +242,6 @@
             }
         });
 
-        // MATRIX LOGIKK
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         let matrixInterval;
@@ -252,43 +250,52 @@
             canvas.style.display = 'block';
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
             const fontSize = 16;
             const columns = canvas.width / fontSize;
             const drops = Array(Math.floor(columns)).fill(1);
-
             function draw() {
                 ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = "#00ff41";
                 ctx.font = fontSize + "px monospace";
-
                 for (let i = 0; i < drops.length; i++) {
                     const text = chars.charAt(Math.floor(Math.random() * chars.length));
                     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                        drops[i] = 0;
-                    }
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                     drops[i]++;
                 }
             }
             matrixInterval = setInterval(draw, 33);
-            setTimeout(() => {
-                clearInterval(matrixInterval);
-                canvas.style.display = 'none';
-            }, 30000); // Stopper automatisk etter 30 sek
+            setTimeout(() => { clearInterval(matrixInterval); canvas.style.display = 'none'; }, 30000);
         }
 
         function handleCommand(cmd) {
             let response = '';
             
             if (cmd === 'help') {
-                response = 'Available: whoami, clear, sudo, contact, vcard, matrix';
+                response = 'Available: ls, cat [file], whoami, social, matrix, progress, joke, vcard, contact, clear';
+            } else if (cmd === 'ls') {
+                response = 'bio.txt  projects.md  identity.pgp';
+            } else if (cmd === 'cat bio.txt') {
+                response = 'Andreas Risøy. Security enthusiast based in Norway. Focused on PGP, DNSSEC, and email hardening.';
+            } else if (cmd === 'cat projects.md') {
+                response = '• risoy.io: Personal Identity Hub<br>• mail-fortress: DMARC/BIMI enforcement guide';
+            } else if (cmd === 'cat identity.pgp') {
+                response = 'PGP Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80';
             } else if (cmd === 'whoami') {
-                response = 'Andreas Risøy. Security enthusiast and PGP advocate.';
-            } else if (cmd === 'sudo') {
-                response = 'User is not in the sudoers file. This incident will be reported.';
+                response = 'Andreas Risøy. PGP Advocate.';
+            } else if (cmd === 'social') {
+                response = '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>';
+            } else if (cmd === 'joke') {
+                const jokes = [
+                    "Why do programmers always mix up Halloween and Christmas? Because Oct 31 == Dec 25.",
+                    "A SQL query walks into a bar, walks up to two tables, and asks... 'Can I join you?'",
+                    "Encryption: The art of making sure your secrets are safe from everyone, including yourself."
+                ];
+                response = jokes[Math.floor(Math.random() * jokes.length)];
+            } else if (cmd === 'progress') {
+                response = 'Checking system...<br>[##########----------] 50%<br>DMARC: ENFORCED<br>SSL: A+ GRADE<br>BIMI: ACTIVE';
             } else if (cmd === 'matrix') {
                 response = 'Wake up, Neo...';
                 startMatrix();
@@ -297,6 +304,8 @@
             } else if (cmd === 'vcard') {
                 response = 'Downloading business card...';
                 window.location.href = '/contact.vcf';
+            } else if (cmd === 'sudo') {
+                response = 'User is not in the sudoers file. This incident will be reported.';
             } else if (cmd === 'clear') {
                 output.innerHTML = '';
                 canvas.style.display = 'none';
@@ -305,7 +314,7 @@
             } else if (cmd === '') {
                 response = '';
             } else {
-                response = `Command not found: ${cmd}`;
+                response = `Command not found: ${cmd}. Type 'help' for options.`;
             }
 
             if (response) {
@@ -314,11 +323,7 @@
         }
 
         document.addEventListener('click', () => input.focus());
-
-        window.onload = () => {
-            typeWriter();
-            fetchLastUpdate();
-        };
+        window.onload = () => { typeWriter(); fetchLastUpdate(); };
     </script>
 </body>
 </html>
