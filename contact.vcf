@@ -1,0 +1,8 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:risoy.io
+EMAIL;TYPE=INTERNET;TYPE=WORK:secure@risoy.io
+URL:https://risoy.io
+X-SOCIALPROFILE;TYPE=bluesky:https://bsky.app/profile/risoy.io
+NOTE:PGP Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80
+END:VCARD
