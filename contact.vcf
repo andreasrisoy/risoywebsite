@@ -1,8 +1,15 @@
 BEGIN:VCARD
 VERSION:3.0
-FN:risoy.io
-EMAIL;TYPE=INTERNET;TYPE=WORK:secure@risoy.io
+FN:Andreas Risøy
+N:Risøy;Andreas;;;
+TITLE:Security Researcher
+ORG:risoy.io
+EMAIL;TYPE=INTERNET;TYPE=WORK;TYPE=PREF:andreas@risoy.io
+EMAIL;TYPE=INTERNET;TYPE=HOME:secure@risoy.io
 URL:https://risoy.io
 X-SOCIALPROFILE;TYPE=bluesky:https://bsky.app/profile/risoy.io
-NOTE:PGP Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80
+X-SOCIALPROFILE;TYPE=github:https://github.com/andreasrisoy
+KEY;TYPE=PGP;ENCODING=b:https://risoy.io/andreas_pub.asc
+NOTE:PGP Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80. Verified at risoy.io.
+REV:2026-05-06T12:00:00Z
 END:VCARD
