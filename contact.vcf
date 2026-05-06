@@ -2,9 +2,9 @@ BEGIN:VCARD
 VERSION:3.0
 FN:Andreas Risøy
 N:Risøy;Andreas;;;
-TITLE:Security Researcher
+TITLE: Mr
 ORG:risoy.io
-EMAIL;TYPE=INTERNET;TYPE=WORK;TYPE=PREF:andreas@risoy.io
+EMAIL;TYPE=INTERNET;TYPE=WORK;TYPE=PREF:post@risoy.io
 EMAIL;TYPE=INTERNET;TYPE=HOME:secure@risoy.io
 URL:https://risoy.io
 X-SOCIALPROFILE;TYPE=bluesky:https://bsky.app/profile/risoy.io
