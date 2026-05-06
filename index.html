@@ -278,9 +278,9 @@
             } else if (cmd === 'ls') {
                 response = 'bio.txt  projects.md  identity.pgp';
             } else if (cmd === 'cat bio.txt') {
-                response = 'Andreas Risøy. Security enthusiast based in Norway. Focused on PGP, DNSSEC, and email hardening.';
-            } else if (cmd === 'cat projects.md') {
-                response = '• risoy.io: Personal Identity Hub<br>• mail-fortress: DMARC/BIMI enforcement guide';
+                response = 'Andreas Risøy. Security enthusiast based in Norway. Focused on PGP, DNSSEC, and email hardening.';} 
+            else if (cmd === 'cat identity.pgp' || cmd === 'pgp') {
+                response = 'Public Key: <a href="/andreas_pub.asc" target="_blank">andreas_pub.asc</a><br>Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80';
             } else if (cmd === 'cat identity.pgp') {
                 response = 'PGP Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80';
             } else if (cmd === 'whoami') {
