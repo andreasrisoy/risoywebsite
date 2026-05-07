@@ -34,7 +34,7 @@
             margin: 0; 
             padding: 20px;
             box-sizing: border-box;
-            overflow: hidden; /* Prevents the whole page from scrolling */
+            overflow: hidden;
         }
 
         #matrix-canvas {
@@ -90,18 +90,16 @@
 
         @keyframes blink { from, to { background-color: transparent; } 50% { background-color: var(--accent); } }
 
-        /* Terminal Scrolling Fix */
         #terminal-output {
             margin-top: 1rem;
             color: var(--accent);
             font-size: 0.85rem;
-            max-height: 200px; /* Limits height to allow scrolling */
-            overflow-y: auto;  /* Enables vertical scroll */
+            max-height: 200px;
+            overflow-y: auto;
             padding-right: 5px;
             line-height: 1.5;
         }
 
-        /* Custom scrollbar for that Matrix feel */
         #terminal-output::-webkit-scrollbar { width: 4px; }
         #terminal-output::-webkit-scrollbar-track { background: #050505; }
         #terminal-output::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
@@ -148,6 +146,7 @@
             <p style="font-size: 0.85rem;">
                 Email: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
                 Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
+                vCard: <a href="/contact.vcf" download>Download Contact</a><br>
                 Key: <a href="/andreas_pub.asc">PGP Public Key</a>
             </p>
         </div>
@@ -205,7 +204,6 @@
                 const cmd = input.value.toLowerCase().trim();
                 handleCommand(cmd);
                 input.value = '';
-                // AUTO-SCROLL FIX:
                 setTimeout(() => { output.scrollTop = output.scrollHeight; }, 10);
             }
         });
@@ -245,7 +243,7 @@
             } else if (cmd === 'ls') {
                 response = 'bio.txt  andreas_pub.asc  drafts/  useless_script.sh';
             } else if (cmd === 'whoami') {
-                response = 'Andreas Risøy. A certified noob who spent three days configuring BIMI just to send a fancy email.';
+                response = 'Andreas Risøy. A certified noob who spent three days configuring BIMI and PGP just to send a fancy email.';
             } else if (cmd === 'neofetch') {
                 response = `<span style="color:var(--text)"><b>risoy.io</b><br>----------<br>OS: Proton-hardened email<br>Kernel: 2.6.0-noob-stable<br>Security: Over-engineered<br>BIMI: Still a mystery</span>`;
             } else if (cmd === 'email') {
