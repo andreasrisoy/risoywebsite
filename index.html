@@ -195,7 +195,7 @@
         
         <div id="links-section">
             <p>
-                Email: <a href="mailto:post@risoy.io">post@risoy.io</a><br>
+                Public Contact: <a href="mailto:post@risoy.io">post@risoy.io</a><br>
                 Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
                 Identity: <a href="/andreas_pub.asc">PGP Key</a><br>
                 vCard: <a href="/contact.vcf" download>Download Contact</a>
@@ -205,7 +205,7 @@
         <div id="terminal-output">Welcome. Type 'help' for options.</div>
 
         <div class="input-line">
-            <span class="prompt">andreas@risoy:~$</span>
+            <span class="prompt">guest@risoy:~$</span>
             <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus>
         </div>
 
@@ -293,9 +293,9 @@
             } else if (cmd === 'ls') {
                 response = 'bio.txt  andreas_pub.asc  drafts/  useless_script.sh';
             } else if (cmd === 'whoami') {
-                response = 'Andreas Risøy. A certified noob who spent three days configuring BIMI and PGP just to send a "Hello" email that looks fancy.';
+                response = 'Andreas Risøy. A certified noob who spent three days configuring BIMI and PGP just to send a fancy email.';
             } else if (cmd === 'neofetch') {
-                response = `<span style="color:var(--text)"><b>andreas@risoy.io</b><br>--------------<br>OS: Proton-based hardened email<br>Host: Porkbun / GitHub Pages<br>Kernel: 2.6.0-noob-stable<br>Uptime: Since last Porkbun renewal<br>Packages: 1 (this terminal)<br>Security: Over-engineered<br>BIMI: 404 Logo Not Found (probably)</span>`;
+                response = `<span style="color:var(--text)"><b>risoy.io</b><br>----------<br>OS: Proton-based hardened email<br>Host: Porkbun / GitHub Pages<br>Kernel: 2.6.0-noob-stable<br>Uptime: Since last Porkbun renewal<br>Packages: 1 (this terminal)<br>Security: Over-engineered<br>BIMI: 404 Logo Not Found (probably)</span>`;
             } else if (cmd === 'email') {
                 response = 'The whole point of this domain: <a href="mailto:post@risoy.io">post@risoy.io</a>. Prevents me from using my embarrassing teen email address.';
             } else if (cmd === 'social') {
@@ -307,8 +307,8 @@
             } else if (cmd === 'joke') {
                 const jokes = [
                     "Why do programmers always mix up Halloween and Christmas? Because Oct 31 == Dec 25.",
-                    "A SQL query walks into a bar, walks up to two tables, and asks... 'Can I join you?'",
-                    "My PGP key is stronger than my New Year's resolutions."
+                    "Why did the hacker get lost? Because he couldn't find the back door.",
+                    "Encryption: The art of making sure your secrets are safe from everyone, including yourself in six months."
                 ];
                 response = jokes[Math.floor(Math.random() * jokes.length)];
             } else if (cmd === 'progress') {
