@@ -34,7 +34,7 @@
             margin: 0; 
             padding: 20px;
             box-sizing: border-box;
-            overflow: hidden;
+            overflow: hidden; /* Prevents the whole page from scrolling */
         }
 
         #matrix-canvas {
@@ -44,7 +44,6 @@
             display: none;
         }
 
-        /* CRT Scanline & Flicker Effect */
         body::after {
             content: " ";
             display: block;
@@ -77,68 +76,38 @@
             display: inline-block;
         }
 
-        .tagline {
-            color: var(--accent);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            font-weight: bold;
-        }
-
-        .description {
-            color: var(--dim);
-            font-size: 0.8rem;
-            margin-bottom: 1.5rem;
-        }
+        .tagline { color: var(--accent); font-size: 0.9rem; margin-top: 0.5rem; font-weight: bold; }
+        .description { color: var(--dim); font-size: 0.8rem; margin-bottom: 1rem; }
 
         .cursor {
             display: inline-block;
-            width: 10px;
-            height: 1.2em;
+            width: 10px; height: 1.2em;
             background-color: var(--accent);
             margin-left: 4px;
             animation: blink 1s step-end infinite;
             vertical-align: middle;
         }
 
-        @keyframes blink {
-            from, to { background-color: transparent; }
-            50% { background-color: var(--accent); }
-        }
+        @keyframes blink { from, to { background-color: transparent; } 50% { background-color: var(--accent); } }
 
-        p { line-height: 1.6; margin: 0.8rem 0; }
-        
-        a { 
-            color: var(--accent); 
-            text-decoration: none; 
-            border-bottom: 1px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        a:hover { 
-            border-bottom: 1px solid var(--accent);
-            background: rgba(0, 255, 65, 0.1);
-        }
-
+        /* Terminal Scrolling Fix */
         #terminal-output {
             margin-top: 1rem;
             color: var(--accent);
             font-size: 0.85rem;
-            min-height: 1.2em;
-            line-height: 1.4;
+            max-height: 200px; /* Limits height to allow scrolling */
+            overflow-y: auto;  /* Enables vertical scroll */
+            padding-right: 5px;
+            line-height: 1.5;
         }
 
-        .input-line {
-            display: flex;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-        }
+        /* Custom scrollbar for that Matrix feel */
+        #terminal-output::-webkit-scrollbar { width: 4px; }
+        #terminal-output::-webkit-scrollbar-track { background: #050505; }
+        #terminal-output::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
-        .prompt {
-            color: var(--accent);
-            margin-right: 10px;
-            user-select: none;
-            font-weight: bold;
-        }
+        .input-line { display: flex; margin-top: 1rem; font-size: 0.9rem; }
+        .prompt { color: var(--accent); margin-right: 10px; user-select: none; font-weight: bold; }
 
         #cmd-input {
             background: transparent;
@@ -150,26 +119,11 @@
             width: 100%;
         }
 
-        .verification {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px dashed #222;
-            font-size: 0.75rem;
-            color: var(--dim);
-        }
-
-        .fingerprint {
-            display: block;
-            margin-top: 5px;
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--text);
-            opacity: 0.4;
-        }
+        .verification { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed #222; font-size: 0.75rem; color: var(--dim); }
+        .fingerprint { display: block; margin-top: 5px; font-size: 0.7rem; color: var(--text); opacity: 0.4; }
 
         .status-line {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
             font-size: 0.6rem;
             color: #222;
             text-transform: uppercase;
@@ -178,10 +132,7 @@
             justify-content: space-between;
         }
 
-        @media (max-width: 480px) {
-            .card { padding: 1.5rem; }
-            h1 { font-size: 1.3rem; }
-        }
+        @media (max-width: 480px) { .card { padding: 1.5rem; } h1 { font-size: 1.3rem; } }
     </style>
 </head>
 <body>
@@ -194,18 +145,17 @@
         <div class="description">Primarily an email domain. 99% DNS settings, 1% actual content.</div>
         
         <div id="links-section">
-            <p>
-                Public Contact: <a href="mailto:post@risoy.io">post@risoy.io</a><br>
+            <p style="font-size: 0.85rem;">
+                Email: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
                 Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
-                Identity: <a href="/andreas_pub.asc">PGP Key</a><br>
-                vCard: <a href="/contact.vcf" download>Download Contact</a>
+                Key: <a href="/andreas_pub.asc">PGP Public Key</a>
             </p>
         </div>
 
-        <div id="terminal-output">Welcome. Type 'help' for options.</div>
+        <div id="terminal-output">Welcome. Type 'help' to begin.</div>
 
         <div class="input-line">
-            <span class="prompt">guest@risoy:~$</span>
+            <span class="prompt">$</span>
             <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus>
         </div>
 
@@ -255,6 +205,8 @@
                 const cmd = input.value.toLowerCase().trim();
                 handleCommand(cmd);
                 input.value = '';
+                // AUTO-SCROLL FIX:
+                setTimeout(() => { output.scrollTop = output.scrollHeight; }, 10);
             }
         });
 
@@ -293,11 +245,11 @@
             } else if (cmd === 'ls') {
                 response = 'bio.txt  andreas_pub.asc  drafts/  useless_script.sh';
             } else if (cmd === 'whoami') {
-                response = 'Andreas Risøy. A certified noob who spent three days configuring BIMI and PGP just to send a fancy email.';
+                response = 'Andreas Risøy. A certified noob who spent three days configuring BIMI just to send a fancy email.';
             } else if (cmd === 'neofetch') {
-                response = `<span style="color:var(--text)"><b>risoy.io</b><br>----------<br>OS: Proton-based hardened email<br>Host: Porkbun / GitHub Pages<br>Kernel: 2.6.0-noob-stable<br>Uptime: Since last Porkbun renewal<br>Packages: 1 (this terminal)<br>Security: Over-engineered<br>BIMI: 404 Logo Not Found (probably)</span>`;
+                response = `<span style="color:var(--text)"><b>risoy.io</b><br>----------<br>OS: Proton-hardened email<br>Kernel: 2.6.0-noob-stable<br>Security: Over-engineered<br>BIMI: Still a mystery</span>`;
             } else if (cmd === 'email') {
-                response = 'The whole point of this domain: <a href="mailto:post@risoy.io">post@risoy.io</a>. Prevents me from using my embarrassing teen email address.';
+                response = 'Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a>. Prevents use of my embarrassing old email address.';
             } else if (cmd === 'social') {
                 response = '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>';
             } else if (cmd === 'cat andreas_pub.asc' || cmd === 'pgp' || cmd === 'cat identity.pgp') {
@@ -305,16 +257,12 @@
             } else if (cmd === 'cat bio.txt') {
                 response = 'Email enthusiast based in Norway. Spends more time on DNS records than actual work.';
             } else if (cmd === 'joke') {
-                const jokes = [
-                    "Why do programmers always mix up Halloween and Christmas? Because Oct 31 == Dec 25.",
-                    "Why did the hacker get lost? Because he couldn't find the back door.",
-                    "Encryption: The art of making sure your secrets are safe from everyone, including yourself in six months."
-                ];
+                const jokes = ["Why do programmers prefer dark mode? Because light attracts bugs.", "My PGP key is stronger than my willpower.", "A SQL query walks into a bar... walks up to two tables and asks, 'Can I join you?'"];
                 response = jokes[Math.floor(Math.random() * jokes.length)];
             } else if (cmd === 'progress') {
-                response = 'Scanning for common sense...<br>[##########----------] 50%<br>DMARC: ENFORCED<br>BIMI: READY-ISH<br>SSL: A+ GRADE';
+                response = 'Scanning for common sense...<br>[##########----------] 50%<br>DMARC: ENFORCED<br>BIMI: READY-ISH';
             } else if (cmd === 'matrix') {
-                response = 'Wake up, Neo...';
+                response = 'Binary rain initiated...';
                 startMatrix();
             } else if (cmd === 'sudo') {
                 response = '<span style="color:#ff4141">Nice try. I am telling your mother. This incident has been logged.</span>';
@@ -329,7 +277,7 @@
             } else if (cmd === '') {
                 response = '';
             } else {
-                response = `Command not found: ${cmd}. Type 'help' for options.`;
+                response = `Command not found: ${cmd}. Type 'help'.`;
             }
 
             if (response) {
