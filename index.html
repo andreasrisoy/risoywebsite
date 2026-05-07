@@ -1,37 +1,344 @@
-<main class="card">
-    <h1 id="typewriter"></h1><span class="cursor"></span>
-    <!-- Your requested Tagline and Description -->
-    <div class="tagline">Over-engineering an email address since 2026.</div>
-    <p class="dim-text" style="font-size: 0.8rem; margin-top: -10px;">
-        Primarily an email domain. 99% DNS settings, 1% actual content.
-    </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     
-    <div id="links-section">
-        <p>
-            Email: <a href="mailto:post@risoy.io">post@risoy.io</a><br>
-            Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
-            Identity: <a href="/andreas_pub.asc">PGP Key</a><br>
-            vCard: <a href="/contact.vcf" download>Download Contact</a>
-        </p>
-    </div>
-
-    <div id="terminal-output">Welcome. Type 'help' for commands.</div>
-
-    <div class="input-line">
-        <span class="prompt">andreas@risoy:~$</span>
-        <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus>
-    </div>
-
-    <div class="verification">
-        <span>VERIFIED PGP FINGERPRINT</span>
-        <code class="fingerprint">
-            E8C1 8510 D29B D842 D19D<br>
-            95A4 EF2F BE81 B750 FA80
-        </code>
-    </div>
+    <meta property="og:title" content="risoy.io">
+    <meta property="og:description" content="Primarily an email domain. 99% DNS settings, 1% actual content.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://risoy.io">
     
-    <div class="status-line">
-        <span id="status-display">System: Online</span>
-        <span>Loc: Stavanger, NO</span>
-    </div>
-</main>
+    <title>risoy.io</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📧</text></svg>">
+    
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --text: #d1d1d1;
+            --accent: #00ff41; 
+            --dim: #444;
+            --crt-glow: rgba(0, 255, 65, 0.05);
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", "Droid Sans Mono", monospace;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            display: none;
+        }
+
+        /* CRT Scanline & Flicker Effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            z-index: 999;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .card { 
+            width: 100%;
+            max-width: 480px;
+            padding: 2.5rem;
+            border-left: 3px solid var(--accent);
+            background: rgba(10, 10, 10, 0.9);
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 0 30px var(--crt-glow);
+        }
+
+        h1 { 
+            font-size: 1.7rem; 
+            margin: 0 0 0.2rem 0; 
+            letter-spacing: -1px;
+            color: var(--accent);
+            display: inline-block;
+        }
+
+        .tagline {
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+
+        .description {
+            color: var(--dim);
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background-color: var(--accent);
+            margin-left: 4px;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            from, to { background-color: transparent; }
+            50% { background-color: var(--accent); }
+        }
+
+        p { line-height: 1.6; margin: 0.8rem 0; }
+        
+        a { 
+            color: var(--accent); 
+            text-decoration: none; 
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        a:hover { 
+            border-bottom: 1px solid var(--accent);
+            background: rgba(0, 255, 65, 0.1);
+        }
+
+        #terminal-output {
+            margin-top: 1rem;
+            color: var(--accent);
+            font-size: 0.85rem;
+            min-height: 1.2em;
+            line-height: 1.4;
+        }
+
+        .input-line {
+            display: flex;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .prompt {
+            color: var(--accent);
+            margin-right: 10px;
+            user-select: none;
+            font-weight: bold;
+        }
+
+        #cmd-input {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+            width: 100%;
+        }
+
+        .verification {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #222;
+            font-size: 0.75rem;
+            color: var(--dim);
+        }
+
+        .fingerprint {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text);
+            opacity: 0.4;
+        }
+
+        .status-line {
+            margin-top: 2rem;
+            font-size: 0.6rem;
+            color: #222;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 1.5rem; }
+            h1 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+
+    <main class="card">
+        <h1 id="typewriter"></h1><span class="cursor"></span>
+        
+        <div class="tagline">Over-engineering an email address since 2026.</div>
+        <div class="description">Primarily an email domain. 99% DNS settings, 1% actual content.</div>
+        
+        <div id="links-section">
+            <p>
+                Email: <a href="mailto:post@risoy.io">post@risoy.io</a><br>
+                Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
+                Identity: <a href="/andreas_pub.asc">PGP Key</a><br>
+                vCard: <a href="/contact.vcf" download>Download Contact</a>
+            </p>
+        </div>
+
+        <div id="terminal-output">Welcome. Type 'help' for options.</div>
+
+        <div class="input-line">
+            <span class="prompt">andreas@risoy:~$</span>
+            <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus>
+        </div>
+
+        <div class="verification">
+            <span>VERIFIED PGP FINGERPRINT</span>
+            <code class="fingerprint">
+                E8C1 8510 D29B D842 D19D<br>
+                95A4 EF2F BE81 B750 FA80
+            </code>
+        </div>
+        
+        <div class="status-line">
+            <span id="status-display">System: Online</span>
+            <span>Loc: Stavanger, NO</span>
+        </div>
+    </main>
+
+    <script>
+        const text = "risoy.io";
+        let i = 0;
+        function typeWriter() {
+            if (i < text.length) {
+                document.getElementById("typewriter").innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 150);
+            }
+        }
+
+        async function fetchLastUpdate() {
+            const user = "andreasrisoy"; 
+            const repo = "risoy-website";
+            try {
+                const response = await fetch(`https://api.github.com/repos/${user}/${repo}/commits/main`);
+                const data = await response.json();
+                const date = new Date(data.commit.author.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' });
+                document.getElementById("status-display").innerHTML = `Patch: ${date}`;
+            } catch (e) {
+                document.getElementById("status-display").innerHTML = `System: Online`;
+            }
+        }
+
+        const input = document.getElementById('cmd-input');
+        const output = document.getElementById('terminal-output');
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = input.value.toLowerCase().trim();
+                handleCommand(cmd);
+                input.value = '';
+            }
+        });
+
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        let matrixInterval;
+
+        function startMatrix() {
+            canvas.style.display = 'block';
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const chars = "01";
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#00ff41";
+                ctx.font = fontSize + "px monospace";
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            matrixInterval = setInterval(draw, 33);
+        }
+
+        function handleCommand(cmd) {
+            let response = '';
+            
+            if (cmd === 'help') {
+                response = 'Available: neofetch, ls, email, whoami, social, matrix, joke, clear, progress, vcard, pgp';
+            } else if (cmd === 'ls') {
+                response = 'bio.txt  andreas_pub.asc  drafts/  useless_script.sh';
+            } else if (cmd === 'whoami') {
+                response = 'Andreas Risøy. A certified noob who spent three days configuring BIMI and PGP just to send a "Hello" email that looks fancy.';
+            } else if (cmd === 'neofetch') {
+                response = `<span style="color:var(--text)"><b>andreas@risoy.io</b><br>--------------<br>OS: Proton-based hardened email<br>Host: Porkbun / GitHub Pages<br>Kernel: 2.6.0-noob-stable<br>Uptime: Since last Porkbun renewal<br>Packages: 1 (this terminal)<br>Security: Over-engineered<br>BIMI: 404 Logo Not Found (probably)</span>`;
+            } else if (cmd === 'email') {
+                response = 'The whole point of this domain: <a href="mailto:post@risoy.io">post@risoy.io</a>. Prevents me from using my embarrassing teen email address.';
+            } else if (cmd === 'social') {
+                response = '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>';
+            } else if (cmd === 'cat andreas_pub.asc' || cmd === 'pgp' || cmd === 'cat identity.pgp') {
+                response = 'Public Key: <a href="/andreas_pub.asc" target="_blank">andreas_pub.asc</a><br>Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80';
+            } else if (cmd === 'cat bio.txt') {
+                response = 'Email enthusiast based in Norway. Spends more time on DNS records than actual work.';
+            } else if (cmd === 'joke') {
+                const jokes = [
+                    "Why do programmers always mix up Halloween and Christmas? Because Oct 31 == Dec 25.",
+                    "A SQL query walks into a bar, walks up to two tables, and asks... 'Can I join you?'",
+                    "My PGP key is stronger than my New Year's resolutions."
+                ];
+                response = jokes[Math.floor(Math.random() * jokes.length)];
+            } else if (cmd === 'progress') {
+                response = 'Scanning for common sense...<br>[##########----------] 50%<br>DMARC: ENFORCED<br>BIMI: READY-ISH<br>SSL: A+ GRADE';
+            } else if (cmd === 'matrix') {
+                response = 'Wake up, Neo...';
+                startMatrix();
+            } else if (cmd === 'sudo') {
+                response = '<span style="color:#ff4141">Nice try. I am telling your mother. This incident has been logged.</span>';
+            } else if (cmd === 'vcard') {
+                response = 'Downloading business card...';
+                window.location.href = '/contact.vcf';
+            } else if (cmd === 'clear') {
+                output.innerHTML = '';
+                canvas.style.display = 'none';
+                clearInterval(matrixInterval);
+                return;
+            } else if (cmd === '') {
+                response = '';
+            } else {
+                response = `Command not found: ${cmd}. Type 'help' for options.`;
+            }
+
+            if (response) {
+                output.innerHTML += `<div><span style="color:var(--dim)">$ ${cmd}</span><br>${response}</div>`;
+            }
+        }
+
+        document.addEventListener('click', () => input.focus());
+        window.onload = () => { typeWriter(); fetchLastUpdate(); };
+    </script>
+</body>
+</html>
