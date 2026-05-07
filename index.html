@@ -145,7 +145,7 @@
         <div id="links-section">
             <p style="font-size: 0.85rem;">
                 Email: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
-                Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
+                Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a> | <a href="https://www.flickr.com/people/risoy/">Flickr</a><br>
                 vCard: <a href="/contact.vcf" download>Download Contact</a><br>
                 Key: <a href="/andreas_pub.asc">PGP Public Key</a>
             </p>
@@ -168,7 +168,7 @@
         
         <div class="status-line">
             <span id="status-display">System: Online</span>
-            <span>Loc: Stavanger, NO</span>
+            <span>Loc: Norway</span>
         </div>
     </main>
 
@@ -249,7 +249,7 @@
             } else if (cmd === 'email') {
                 response = 'Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a>. Prevents use of my embarrassing old email address.';
             } else if (cmd === 'social') {
-                response = '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>';
+                response = '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://www.flickr.com/people/risoy/" target="_blank">Flickr</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>';
             } else if (cmd === 'cat andreas_pub.asc' || cmd === 'pgp' || cmd === 'cat identity.pgp') {
                 response = 'Public Key: <a href="/andreas_pub.asc" target="_blank">andreas_pub.asc</a><br>Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80';
             } else if (cmd === 'cat bio.txt') {
