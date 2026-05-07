@@ -1,329 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
+<main class="card">
+    <h1 id="typewriter"></h1><span class="cursor"></span>
+    <!-- Your requested Tagline and Description -->
+    <div class="tagline">Over-engineering an email address since 2026.</div>
+    <p class="dim-text" style="font-size: 0.8rem; margin-top: -10px;">
+        Primarily an email domain. 99% DNS settings, 1% actual content.
+    </p>
     
-    <meta property="og:title" content="risoy.io">
-    <meta property="og:description" content="Security & Privacy Research. Verified Identity.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://risoy.io">
+    <div id="links-section">
+        <p>
+            Email: <a href="mailto:post@risoy.io">post@risoy.io</a><br>
+            Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
+            Identity: <a href="/andreas_pub.asc">PGP Key</a><br>
+            vCard: <a href="/contact.vcf" download>Download Contact</a>
+        </p>
+    </div>
+
+    <div id="terminal-output">Welcome. Type 'help' for commands.</div>
+
+    <div class="input-line">
+        <span class="prompt">andreas@risoy:~$</span>
+        <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus>
+    </div>
+
+    <div class="verification">
+        <span>VERIFIED PGP FINGERPRINT</span>
+        <code class="fingerprint">
+            E8C1 8510 D29B D842 D19D<br>
+            95A4 EF2F BE81 B750 FA80
+        </code>
+    </div>
     
-    <title>risoy.io</title>
-
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
-    
-    <style>
-        :root {
-            --bg: #0a0a0a;
-            --text: #d1d1d1;
-            --accent: #00ff41; 
-            --dim: #444;
-        }
-
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", "Droid Sans Mono", monospace;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-
-        #matrix-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            display: none;
-        }
-
-        body::after {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-            z-index: 999;
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
-        }
-
-        .card { 
-            width: 100%;
-            max-width: 450px;
-            padding: 2rem;
-            border-left: 1px solid var(--dim);
-            background: rgba(10, 10, 10, 0.9);
-            position: relative;
-            z-index: 10;
-        }
-
-        h1 { 
-            font-size: 1.5rem; 
-            margin: 0 0 0.5rem 0; 
-            letter-spacing: -1px;
-            color: var(--accent);
-            display: inline-block;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 1.2em;
-            background-color: var(--accent);
-            margin-left: 4px;
-            animation: blink 1s step-end infinite;
-            vertical-align: middle;
-        }
-
-        @keyframes blink {
-            from, to { background-color: transparent; }
-            50% { background-color: var(--accent); }
-        }
-
-        p { line-height: 1.6; margin: 0.8rem 0; }
-        
-        a { 
-            color: var(--accent); 
-            text-decoration: none; 
-            border-bottom: 1px solid transparent;
-            transition: all 0.2s ease;
-        }
-
-        a:hover { 
-            border-bottom: 1px solid var(--accent);
-            background: rgba(0, 255, 65, 0.1);
-        }
-
-        #terminal-output {
-            margin-top: 1rem;
-            color: var(--accent);
-            font-size: 0.8rem;
-            min-height: 1.2em;
-        }
-
-        .input-line {
-            display: flex;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .input-line span {
-            color: var(--accent);
-            margin-right: 8px;
-            user-select: none;
-        }
-
-        #cmd-input {
-            background: transparent;
-            border: none;
-            color: var(--text);
-            font-family: inherit;
-            font-size: inherit;
-            outline: none;
-            width: 100%;
-        }
-
-        #cmd-input::placeholder {
-            color: var(--dim);
-            opacity: 0.5;
-        }
-
-        .verification {
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px dashed var(--dim);
-            font-size: 0.8rem;
-            color: var(--dim);
-        }
-
-        .fingerprint {
-            display: block;
-            margin-top: 5px;
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--text);
-            opacity: 0.6;
-        }
-
-        .status-line {
-            margin-top: 2rem;
-            font-size: 0.65rem;
-            color: #333;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        @media (max-width: 480px) {
-            .card { padding: 1.5rem; }
-            h1 { font-size: 1.2rem; }
-        }
-    </style>
-</head>
-<body>
-    <canvas id="matrix-canvas"></canvas>
-
-    <main class="card">
-        <h1 id="typewriter"></h1><span class="cursor"></span>
-        <p class="dim-text">Security & Privacy Research</p>
-        
-        <div id="links-section">
-            <p>
-                Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
-                Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a><br>
-                Policy: <a href="/.well-known/security.txt">security.txt</a><br>
-                vCard: <a href="/contact.vcf" download>vCard</a>
-            </p>
-        </div>
-
-        <div id="terminal-output"></div>
-
-        <div class="input-line">
-            <span>&gt;</span>
-            <input type="text" id="cmd-input" placeholder="type 'help'..." spellcheck="false" autocomplete="off" autofocus>
-        </div>
-
-        <div class="verification">
-            <span class="dim-text">PGP FINGERPRINT</span>
-            <code class="fingerprint">
-                E8C1 8510 D29B D842 D19D<br>
-                95A4 EF2F BE81 B750 FA80
-            </code>
-        </div>
-        
-        <div class="status-line" id="status-display">
-            System: Online | Deployment: Fetching...
-        </div>
-    </main>
-
-    <script>
-        const text = "risoy.io";
-        let i = 0;
-        function typeWriter() {
-            if (i < text.length) {
-                document.getElementById("typewriter").innerHTML += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 150);
-            }
-        }
-
-        async function fetchLastUpdate() {
-            const user = "andreasrisoy"; 
-            const repo = "risoy-website";
-            try {
-                const response = await fetch(`https://api.github.com/repos/${user}/${repo}/commits/main`);
-                const data = await response.json();
-                const date = new Date(data.commit.author.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' });
-                document.getElementById("status-display").innerHTML = `System: Online | Last Patch: ${date}`;
-            } catch (e) {
-                document.getElementById("status-display").innerHTML = `System: Online | Mode: Stealth`;
-            }
-        }
-
-        const input = document.getElementById('cmd-input');
-        const output = document.getElementById('terminal-output');
-
-        input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const cmd = input.value.toLowerCase().trim();
-                handleCommand(cmd);
-                input.value = '';
-            }
-        });
-
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
-        let matrixInterval;
-
-        function startMatrix() {
-            canvas.style.display = 'block';
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
-            const fontSize = 16;
-            const columns = canvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
-            function draw() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#00ff41";
-                ctx.font = fontSize + "px monospace";
-                for (let i = 0; i < drops.length; i++) {
-                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
-                }
-            }
-            matrixInterval = setInterval(draw, 33);
-            setTimeout(() => { clearInterval(matrixInterval); canvas.style.display = 'none'; }, 30000);
-        }
-
-        function handleCommand(cmd) {
-            let response = '';
-            
-            if (cmd === 'help') {
-                response = 'Available: ls, cat [file], whoami, social, matrix, progress, joke, vcard, contact, clear';
-            } else if (cmd === 'ls') {
-                response = 'bio.txt  projects.md  identity.pgp';
-            } else if (cmd === 'cat bio.txt') {
-                response = 'Andreas Risøy. Security enthusiast based in Norway. Focused on PGP, DNSSEC, and email hardening.';} 
-            else if (cmd === 'cat identity.pgp' || cmd === 'pgp') {
-                response = 'Public Key: <a href="/andreas_pub.asc" target="_blank">andreas_pub.asc</a><br>Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80';
-            } else if (cmd === 'cat identity.pgp') {
-                response = 'PGP Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80';
-            } else if (cmd === 'whoami') {
-                response = 'Andreas Risøy. PGP Advocate.';
-            } else if (cmd === 'social') {
-                response = '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>';
-            } else if (cmd === 'joke') {
-                const jokes = [
-                    "Why do programmers always mix up Halloween and Christmas? Because Oct 31 == Dec 25.",
-                    "A SQL query walks into a bar, walks up to two tables, and asks... 'Can I join you?'",
-                    "Encryption: The art of making sure your secrets are safe from everyone, including yourself."
-                ];
-                response = jokes[Math.floor(Math.random() * jokes.length)];
-            } else if (cmd === 'progress') {
-                response = 'Checking system...<br>[##########----------] 50%<br>DMARC: ENFORCED<br>SSL: A+ GRADE<br>BIMI: ACTIVE';
-            } else if (cmd === 'matrix') {
-                response = 'Wake up, Neo...';
-                startMatrix();
-            } else if (cmd === 'contact') {
-                response = 'Direct line: secure@risoy.io';
-            } else if (cmd === 'vcard') {
-                response = 'Downloading business card...';
-                window.location.href = '/contact.vcf';
-            } else if (cmd === 'sudo') {
-                response = 'User is not in the sudoers file. This incident will be reported.';
-            } else if (cmd === 'clear') {
-                output.innerHTML = '';
-                canvas.style.display = 'none';
-                clearInterval(matrixInterval);
-                return;
-            } else if (cmd === '') {
-                response = '';
-            } else {
-                response = `Command not found: ${cmd}. Type 'help' for options.`;
-            }
-
-            if (response) {
-                output.innerHTML = `<div><span style="color:var(--dim)">$ ${cmd}</span><br>${response}</div>`;
-            }
-        }
-
-        document.addEventListener('click', () => input.focus());
-        window.onload = () => { typeWriter(); fetchLastUpdate(); };
-    </script>
-</body>
-</html>
+    <div class="status-line">
+        <span id="status-display">System: Online</span>
+        <span>Loc: Stavanger, NO</span>
+    </div>
+</main>
