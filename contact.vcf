@@ -2,9 +2,8 @@ BEGIN:VCARD
 VERSION:3.0
 FN:Lege Andreas Risøy
 N:Risøy;Andreas;;Lege;
-TITLE:Lege (Allmennmedisin)
+TITLE:Lege (Allmennmedisin) / Security Researcher
 ORG:Lege Andreas Risøy;Org nr 928 608 050
-TEL;TYPE=WORK,VOICE:+4793208799
 ADR;TYPE=WORK,PREF:;;Vestre Vervikhagen 9;Tau;;4121;Norway
 EMAIL;TYPE=INTERNET;TYPE=WORK;TYPE=PREF:post@risoy.io
 EMAIL;TYPE=INTERNET;TYPE=HOME:secure@risoy.io
@@ -15,5 +14,5 @@ X-SOCIALPROFILE;TYPE=github:https://github.com/andreasrisoy
 X-SOCIALPROFILE;TYPE=flickr:https://www.flickr.com/people/risoy/
 KEY;TYPE=PGP:https://risoy.io/andreas_pub.asc
 NOTE:Org nr 928 608 050. PGP Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80. Verifisert identitet via risoy.io.
-REV:2026-05-07T23:20:00Z
+REV:2026-05-07T23:30:00Z
 END:VCARD
