@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,6 @@
     <meta property="og:url" content="https://risoy.io">
     
     <title>risoy.io</title>
-
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📧</text></svg>">
     
     <style>
@@ -44,6 +43,7 @@
             display: none;
         }
 
+        /* Scanline Overlay */
         body::after {
             content: " ";
             display: block;
@@ -68,14 +68,7 @@
             box-shadow: 0 0 30px var(--crt-glow);
         }
 
-        h1 { 
-            font-size: 1.7rem; 
-            margin: 0 0 0.2rem 0; 
-            letter-spacing: -1px;
-            color: var(--accent);
-            display: inline-block;
-        }
-
+        h1 { font-size: 1.7rem; margin: 0; letter-spacing: -1px; color: var(--accent); display: inline-block; }
         .tagline { color: var(--accent); font-size: 0.9rem; margin-top: 0.5rem; font-weight: bold; }
         .description { color: var(--dim); font-size: 0.8rem; margin-bottom: 1rem; }
 
@@ -87,7 +80,6 @@
             animation: blink 1s step-end infinite;
             vertical-align: middle;
         }
-
         @keyframes blink { from, to { background-color: transparent; } 50% { background-color: var(--accent); } }
 
         #terminal-output {
@@ -112,13 +104,12 @@
             border: none;
             color: var(--text);
             font-family: inherit;
-            font-size: inherit;
             outline: none;
             width: 100%;
         }
 
         .verification { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed #222; font-size: 0.75rem; color: var(--dim); }
-        .fingerprint { display: block; margin-top: 5px; font-size: 0.7rem; color: var(--text); opacity: 0.4; }
+        .fingerprint { display: block; margin-top: 5px; font-size: 0.7rem; color: var(--text); opacity: 0.4; line-height: 1.4; }
 
         .status-line {
             margin-top: 1.5rem;
@@ -137,34 +128,36 @@
     <canvas id="matrix-canvas"></canvas>
 
     <main class="card">
-        <h1 id="typewriter"></h1><span class="cursor"></span>
+        <header>
+            <h1 id="typewriter"></h1><span class="cursor"></span>
+            <p class="tagline">Over-engineering an email address since 2026.</p>
+            <p class="description">Primarily an email domain. 99% DNS settings, 1% actual content.</p>
+        </header>
         
-        <div class="tagline">Over-engineering an email address since 2026.</div>
-        <div class="description">Primarily an email domain. 99% DNS settings, 1% actual content.</div>
-        
-        <div id="links-section">
+        <nav id="links-section">
             <p style="font-size: 0.85rem;">
                 Email: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
-                Social: <a href="https://bsky.app/profile/risoy.io">Bluesky</a> | <a href="https://www.flickr.com/people/risoy/">Flickr</a><br>
+                Social: <a href="https://bsky.app/profile/risoy.io" target="_blank" rel="noopener">Bluesky</a> | 
+                        <a href="https://www.flickr.com/people/risoy/" target="_blank" rel="noopener">Flickr</a><br>
                 vCard: <a href="/contact.vcf" download>Download Contact</a><br>
                 Key: <a href="/andreas_pub.asc">PGP Public Key</a>
             </p>
-        </div>
+        </nav>
 
         <div id="terminal-output">Welcome. Type 'help' to begin.</div>
 
         <div class="input-line">
             <span class="prompt">$</span>
-            <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus>
+            <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus aria-label="Terminal input">
         </div>
 
-        <div class="verification">
+        <footer class="verification">
             <span>VERIFIED PGP FINGERPRINT</span>
             <code class="fingerprint">
                 E8C1 8510 D29B D842 D19D<br>
                 95A4 EF2F BE81 B750 FA80
             </code>
-        </div>
+        </footer>
         
         <div class="status-line">
             <span id="status-display">System: Online</span>
@@ -173,115 +166,112 @@
     </main>
 
     <script>
+        // DOM Caching
+        const output = document.getElementById('terminal-output');
+        const input = document.getElementById('cmd-input');
+        const statusDisplay = document.getElementById("status-display");
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 1. Typewriter Effect (Refactored)
         const text = "risoy.io";
-        let i = 0;
+        let charIndex = 0;
         function typeWriter() {
-            if (i < text.length) {
-                document.getElementById("typewriter").innerHTML += text.charAt(i);
-                i++;
+            if (charIndex < text.length) {
+                document.getElementById("typewriter").textContent += text.charAt(charIndex);
+                charIndex++;
                 setTimeout(typeWriter, 150);
             }
         }
 
-        async function fetchLastUpdate() {
-            const user = "andreasrisoy"; 
-            const repo = "risoy-website";
-            try {
-                const response = await fetch(`https://api.github.com/repos/${user}/${repo}/commits/main`);
-                const data = await response.json();
-                const date = new Date(data.commit.author.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' });
-                document.getElementById("status-display").innerHTML = `Patch: ${date}`;
-            } catch (e) {
-                document.getElementById("status-display").innerHTML = `System: Online`;
+        // 2. Command Mapping (The "Better" way to handle IF-ELSE)
+        const commands = {
+            'help': () => 'Available: neofetch, ls, email, whoami, social, matrix, joke, clear, progress, vcard, pgp',
+            'ls': () => 'bio.txt  andreas_pub.asc  drafts/  useless_script.sh',
+            'whoami': () => 'Andreas Risøy. A certified noob who spent three days configuring BIMI and PGP just to send a fancy email.',
+            'neofetch': () => `<span style="color:var(--text)"><b>risoy.io</b><br>----------<br>OS: Proton-hardened email<br>Kernel: 2.6.0-noob-stable<br>Security: Over-engineered<br>BIMI: Still a mystery</span>`,
+            'email': () => 'Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a>. Prevents use of my embarrassing old email address.',
+            'social': () => '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://www.flickr.com/people/risoy/" target="_blank">Flickr</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>',
+            'pgp': () => 'Public Key: <a href="/andreas_pub.asc" target="_blank">andreas_pub.asc</a><br>Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80',
+            'cat andreas_pub.asc': () => commands.pgp(),
+            'cat bio.txt': () => 'Email enthusiast based in Norway. Spends more time on DNS records enn actual work.',
+            'joke': () => {
+                const jokes = [
+                    "Why do programmers prefer dark mode? Because light attracts bugs.",
+                    "My PGP key is stronger than my willpower.",
+                    "A SQL query walks into a bar... walks up to two tables and asks, 'Can I join you?'"
+                ];
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            },
+            'progress': () => 'Scanning for common sense...<br>[##########----------] 50%<br>DMARC: ENFORCED<br>BIMI: READY-ISH',
+            'matrix': () => { startMatrix(); return 'Binary rain initiated...'; },
+            'vcard': () => { window.location.href = '/contact.vcf'; return 'Downloading business card...'; },
+            'sudo': () => '<span style="color:#ff4141">Nice try. I am telling your mother. This incident has been logged.</span>',
+            'clear': () => { output.innerHTML = ''; stopMatrix(); return null; }
+        };
+
+        function handleCommand(rawCmd) {
+            const cmd = rawCmd.toLowerCase().trim();
+            if (cmd === '') return;
+
+            let response = commands[cmd] ? commands[cmd]() : `Command not found: ${cmd}. Type 'help'.`;
+            
+            if (response !== null) {
+                output.innerHTML += `<div><span style="color:var(--dim)">$ ${cmd}</span><br>${response}</div>`;
+                output.scrollTop = output.scrollHeight;
             }
         }
 
-        const input = document.getElementById('cmd-input');
-        const output = document.getElementById('terminal-output');
-
-        input.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const cmd = input.value.toLowerCase().trim();
-                handleCommand(cmd);
-                input.value = '';
-                setTimeout(() => { output.scrollTop = output.scrollHeight; }, 10);
-            }
-        });
-
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
+        // 3. Matrix Rain Logic
         let matrixInterval;
-
         function startMatrix() {
             canvas.style.display = 'block';
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            const chars = "01";
             const fontSize = 16;
             const columns = canvas.width / fontSize;
             const drops = Array(Math.floor(columns)).fill(1);
+
             function draw() {
                 ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = "#00ff41";
-                ctx.font = fontSize + "px monospace";
+                ctx.font = `${fontSize}px monospace`;
                 for (let i = 0; i < drops.length; i++) {
-                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                    const text = Math.random() > 0.5 ? "0" : "1";
                     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
                     if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                     drops[i]++;
                 }
             }
+            if (matrixInterval) clearInterval(matrixInterval);
             matrixInterval = setInterval(draw, 33);
         }
 
-        function handleCommand(cmd) {
-            let response = '';
-            
-            if (cmd === 'help') {
-                response = 'Available: neofetch, ls, email, whoami, social, matrix, joke, clear, progress, vcard, pgp';
-            } else if (cmd === 'ls') {
-                response = 'bio.txt  andreas_pub.asc  drafts/  useless_script.sh';
-            } else if (cmd === 'whoami') {
-                response = 'Andreas Risøy. A certified noob who spent three days configuring BIMI and PGP just to send a fancy email.';
-            } else if (cmd === 'neofetch') {
-                response = `<span style="color:var(--text)"><b>risoy.io</b><br>----------<br>OS: Proton-hardened email<br>Kernel: 2.6.0-noob-stable<br>Security: Over-engineered<br>BIMI: Still a mystery</span>`;
-            } else if (cmd === 'email') {
-                response = 'Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a>. Prevents use of my embarrassing old email address.';
-            } else if (cmd === 'social') {
-                response = '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://www.flickr.com/people/risoy/" target="_blank">Flickr</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>';
-            } else if (cmd === 'cat andreas_pub.asc' || cmd === 'pgp' || cmd === 'cat identity.pgp') {
-                response = 'Public Key: <a href="/andreas_pub.asc" target="_blank">andreas_pub.asc</a><br>Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80';
-            } else if (cmd === 'cat bio.txt') {
-                response = 'Email enthusiast based in Norway. Spends more time on DNS records than actual work.';
-            } else if (cmd === 'joke') {
-                const jokes = ["Why do programmers prefer dark mode? Because light attracts bugs.", "My PGP key is stronger than my willpower.", "A SQL query walks into a bar... walks up to two tables and asks, 'Can I join you?'"];
-                response = jokes[Math.floor(Math.random() * jokes.length)];
-            } else if (cmd === 'progress') {
-                response = 'Scanning for common sense...<br>[##########----------] 50%<br>DMARC: ENFORCED<br>BIMI: READY-ISH';
-            } else if (cmd === 'matrix') {
-                response = 'Binary rain initiated...';
-                startMatrix();
-            } else if (cmd === 'sudo') {
-                response = '<span style="color:#ff4141">Nice try. I am telling your mother. This incident has been logged.</span>';
-            } else if (cmd === 'vcard') {
-                response = 'Downloading business card...';
-                window.location.href = '/contact.vcf';
-            } else if (cmd === 'clear') {
-                output.innerHTML = '';
-                canvas.style.display = 'none';
-                clearInterval(matrixInterval);
-                return;
-            } else if (cmd === '') {
-                response = '';
-            } else {
-                response = `Command not found: ${cmd}. Type 'help'.`;
-            }
+        function stopMatrix() {
+            canvas.style.display = 'none';
+            clearInterval(matrixInterval);
+        }
 
-            if (response) {
-                output.innerHTML += `<div><span style="color:var(--dim)">$ ${cmd}</span><br>${response}</div>`;
+        // 4. GitHub API integration
+        async function fetchLastUpdate() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/andreasrisoy/risoy-website/commits/main`);
+                const data = await response.json();
+                const date = new Date(data.commit.author.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' });
+                statusDisplay.textContent = `Patch: ${date}`;
+            } catch (e) {
+                statusDisplay.textContent = `System: Online`;
             }
         }
+
+        // Event Listeners
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleCommand(input.value);
+                input.value = '';
+            }
+        });
 
         document.addEventListener('click', () => input.focus());
         window.onload = () => { typeWriter(); fetchLastUpdate(); };
