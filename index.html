@@ -15,17 +15,18 @@
     
     <style>
         :root {
-            --bg: #0a0a0a;
-            --text: #d1d1d1;
-            --accent: #00ff41; 
-            --dim: #444;
-            --crt-glow: rgba(0, 255, 65, 0.05);
+            --bg: #0b0f17; 
+            --card-bg: #111827; 
+            --text: #f3f4f6; 
+            --accent: #3b82f6; 
+            --dim: #9ca3af; 
+            --border: #1f2937; 
         }
 
         body { 
             background: var(--bg); 
             color: var(--text); 
-            font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Mono", "Droid Sans Mono", monospace;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -33,7 +34,6 @@
             margin: 0; 
             padding: 20px;
             box-sizing: border-box;
-            overflow: hidden;
         }
 
         #matrix-canvas {
@@ -43,61 +43,63 @@
             display: none;
         }
 
-        /* Scanline Overlay */
-        body::after {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-            z-index: 999;
-            background-size: 100% 3px, 3px 100%;
-            pointer-events: none;
-            opacity: 0.8;
-        }
-
         .card { 
             width: 100%;
-            max-width: 480px;
+            max-width: 440px;
             padding: 2.5rem;
-            border-left: 3px solid var(--accent);
-            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--card-bg);
             position: relative;
             z-index: 10;
-            box-shadow: 0 0 30px var(--crt-glow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
         }
 
-        h1 { font-size: 1.7rem; margin: 0; letter-spacing: -1px; color: var(--accent); display: inline-block; }
-        .tagline { color: var(--accent); font-size: 0.9rem; margin-top: 0.5rem; font-weight: bold; }
-        .description { color: var(--dim); font-size: 0.8rem; margin-bottom: 1rem; }
+        h1 { font-size: 1.5rem; font-weight: 600; margin: 0; color: var(--text); letter-spacing: -0.5px; }
+        .tagline { color: var(--accent); font-size: 0.85rem; margin-top: 0.4rem; font-weight: 500; }
+        .description { color: var(--dim); font-size: 0.8rem; margin-top: 0.2rem; margin-bottom: 1.5rem; line-height: 1.4; }
 
-        .cursor {
-            display: inline-block;
-            width: 10px; height: 1.2em;
-            background-color: var(--accent);
-            margin-left: 4px;
-            animation: blink 1s step-end infinite;
-            vertical-align: middle;
+        #links-section p { margin: 0; line-height: 1.6; }
+        #links-section a { 
+            color: var(--text); 
+            text-decoration: none; 
+            border-bottom: 1px solid var(--border);
+            transition: border-color 0.2s, color 0.2s;
         }
-        @keyframes blink { from, to { background-color: transparent; } 50% { background-color: var(--accent); } }
+        #links-section a:hover { color: var(--accent); border-color: var(--accent); }
+
+        .terminal-container {
+            margin-top: 1.5rem;
+            background: #070a10;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
 
         #terminal-output {
-            margin-top: 1rem;
-            color: var(--accent);
-            font-size: 0.85rem;
-            max-height: 200px;
+            color: var(--dim);
+            font-family: "SF Mono", "SFProMono-Regular", Consolas, monospace;
+            font-size: 0.8rem;
+            max-height: 140px;
             overflow-y: auto;
             padding-right: 5px;
             line-height: 1.5;
         }
+        
+        #terminal-output b { color: var(--text); }
+        #terminal-output a { color: var(--accent); text-decoration: none; }
 
         #terminal-output::-webkit-scrollbar { width: 4px; }
-        #terminal-output::-webkit-scrollbar-track { background: #050505; }
-        #terminal-output::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+        #terminal-output::-webkit-scrollbar-track { background: transparent; }
+        #terminal-output::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-        .input-line { display: flex; margin-top: 1rem; font-size: 0.9rem; }
-        .prompt { color: var(--accent); margin-right: 10px; user-select: none; font-weight: bold; }
+        .input-line { 
+            display: flex; 
+            margin-top: 0.5rem; 
+            font-size: 0.8rem;
+            font-family: "SF Mono", "SFProMono-Regular", Consolas, monospace;
+        }
+        .prompt { color: var(--accent); margin-right: 8px; user-select: none; font-weight: bold; }
 
         #cmd-input {
             background: transparent;
@@ -108,15 +110,29 @@
             width: 100%;
         }
 
-        .verification { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed #222; font-size: 0.75rem; color: var(--dim); }
-        .fingerprint { display: block; margin-top: 5px; font-size: 0.7rem; color: var(--text); opacity: 0.4; line-height: 1.4; }
+        .verification { 
+            margin-top: 2rem; 
+            padding-top: 1rem; 
+            border-top: 1px solid var(--border); 
+            font-size: 0.7rem; 
+            color: var(--dim); 
+            letter-spacing: 0.5px;
+        }
+        .fingerprint { 
+            display: block; 
+            margin-top: 6px; 
+            font-family: "SF Mono", "SFProMono-Regular", Consolas, monospace;
+            font-size: 0.7rem; 
+            color: var(--dim); 
+            opacity: 0.7; 
+            line-height: 1.4; 
+        }
 
         .status-line {
             margin-top: 1.5rem;
-            font-size: 0.6rem;
-            color: #222;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-size: 0.65rem;
+            color: var(--dim);
+            opacity: 0.5;
             display: flex;
             justify-content: space-between;
         }
@@ -129,7 +145,7 @@
 
     <main class="card">
         <header>
-            <h1 id="typewriter"></h1><span class="cursor"></span>
+            <h1 id="typewriter"></h1>
             <p class="tagline">Over-engineering an email address since 2026.</p>
             <p class="description">Primarily an email domain. 99% DNS settings, 1% actual content.</p>
         </header>
@@ -137,31 +153,32 @@
         <nav id="links-section">
             <p style="font-size: 0.85rem;">
                 Email: <a href="mailto:secure@risoy.io">secure@risoy.io</a><br>
-                Social: <a href="https://bsky.app/profile/risoy.io" target="_blank" rel="noopener">Bluesky</a> | 
+                Social: <a href="https://www.linkedin.com/in/andreasrisoy" target="_blank" rel="noopener">LinkedIn</a> | 
+                        <a href="https://bsky.app/profile/risoy.io" target="_blank" rel="noopener">Bluesky</a> | 
                         <a href="https://www.flickr.com/people/risoy/" target="_blank" rel="noopener">Flickr</a><br>
                 vCard: <a href="/contact.vcf" download>Download Contact</a><br>
                 Key: <a href="/andreas_pub.asc">PGP Public Key</a>
             </p>
         </nav>
 
-        <div id="terminal-output">Welcome. Type 'help' to begin.</div>
-
-        <div class="input-line">
-            <span class="prompt">$</span>
-            <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus aria-label="Terminal input">
+        <div class="terminal-container">
+            <div id="terminal-output">System ready. Type 'help' for console tools.</div>
+            <div class="input-line">
+                <span class="prompt">&gt;</span>
+                <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus aria-label="Console input">
+            </div>
         </div>
 
         <footer class="verification">
             <span>VERIFIED PGP FINGERPRINT</span>
             <code class="fingerprint">
-                E8C1 8510 D29B D842 D19D<br>
-                95A4 EF2F BE81 B750 FA80
+                E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80
             </code>
         </footer>
         
         <div class="status-line">
             <span id="status-display">System: Online</span>
-            <span>Loc: Norway</span>
+            <span>Location: Norway</span>
         </div>
     </main>
 
@@ -169,32 +186,34 @@
         // DOM Caching
         const output = document.getElementById('terminal-output');
         const input = document.getElementById('cmd-input');
+        const titleDisplay = document.getElementById("typewriter");
         const statusDisplay = document.getElementById("status-display");
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
 
-        // 1. Typewriter Effect (Refactored)
+        // 1. Typewriter Effect
         const text = "risoy.io";
         let charIndex = 0;
         function typeWriter() {
             if (charIndex < text.length) {
-                document.getElementById("typewriter").textContent += text.charAt(charIndex);
+                titleDisplay.textContent += text.charAt(charIndex);
                 charIndex++;
-                setTimeout(typeWriter, 150);
+                setTimeout(typeWriter, 120);
             }
         }
 
-        // 2. Command Mapping (The "Better" way to handle IF-ELSE)
+        // 2. Command Mapping
         const commands = {
-            'help': () => 'Available: neofetch, ls, email, whoami, social, matrix, joke, clear, progress, vcard, pgp',
+            'help': () => 'Available: neofetch, ls, email, whoami, social, matrix, joke, clear, progress, vcard, pgp, dns, scan',
             'ls': () => 'bio.txt  andreas_pub.asc  drafts/  useless_script.sh',
-            'whoami': () => 'Andreas Risøy. A certified noob who spent three days configuring BIMI and PGP just to send a fancy email.',
-            'neofetch': () => `<span style="color:var(--text)"><b>risoy.io</b><br>----------<br>OS: Proton-hardened email<br>Kernel: 2.6.0-noob-stable<br>Security: Over-engineered<br>BIMI: Still a mystery</span>`,
+            'whoami': () => 'Andreas Risøy. Lege & Security Researcher. A certified noob who spent three days configuring BIMI and PGP just to send a fancy email.',
+            'neofetch': () => `<b>risoy.io</b><br>----------<br>OS: Proton-hardened email<br>Kernel: 2.6.0-noob-stable<br>Security: Over-engineered<br>BIMI: Still a mystery`,
             'email': () => 'Contact: <a href="mailto:secure@risoy.io">secure@risoy.io</a>. Prevents use of my embarrassing old email address.',
-            'social': () => '• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://www.flickr.com/people/risoy/" target="_blank">Flickr</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>',
+            'social': () => '• <a href="https://www.linkedin.com/in/andreasrisoy" target="_blank">LinkedIn</a><br>• <a href="https://bsky.app/profile/risoy.io" target="_blank">Bluesky</a><br>• <a href="https://www.flickr.com/people/risoy/" target="_blank">Flickr</a><br>• <a href="https://github.com/andreasrisoy" target="_blank">GitHub</a>',
             'pgp': () => 'Public Key: <a href="/andreas_pub.asc" target="_blank">andreas_pub.asc</a><br>Fingerprint: E8C1 8510 D29B D842 D19D 95A4 EF2F BE81 B750 FA80',
             'cat andreas_pub.asc': () => commands.pgp(),
-            'cat bio.txt': () => 'Email enthusiast based in Norway. Spends more time on DNS records enn actual work.',
+            'cat identity.pgp': () => commands.pgp(),
+            'cat bio.txt': () => 'Email enthusiast based in Norway. Spends more time on DNS records than actual work.',
             'joke': () => {
                 const jokes = [
                     "Why do programmers prefer dark mode? Because light attracts bugs.",
@@ -203,10 +222,15 @@
                 ];
                 return jokes[Math.floor(Math.random() * jokes.length)];
             },
-            'progress': () => 'Scanning for common sense...<br>[##########----------] 50%<br>DMARC: ENFORCED<br>BIMI: READY-ISH',
+            'progress': () => 'Scanning for common sense...<br>[##########----------] 50%<br>DMARC: ENFORCED (Quarantine)<br>BIMI: READY-ISH',
+            'dns': () => '[DNS SECURITY STATUS]<br>-------------------<br>DNSSEC: SIGNED & ACTIVE<br>SPF: PASS (Proton Mail)<br>DKIM: PASS (Proton Mail)<br>DMARC: QUARANTINE',
+            'scan': () => {
+                const userAgent = navigator.userAgent.split(" ")[0];
+                return `Initiating client audit...<br>Status: <span style="color:#3b82f6">SECURE</span><br>Agent: ${userAgent}<br>Payload: None detected.`;
+            },
             'matrix': () => { startMatrix(); return 'Binary rain initiated...'; },
             'vcard': () => { window.location.href = '/contact.vcf'; return 'Downloading business card...'; },
-            'sudo': () => '<span style="color:#ff4141">Nice try. I am telling your mother. This incident has been logged.</span>',
+            'sudo': () => '<span style="color:#ef4444">Nice try. I am telling your mother. This incident has been logged.</span>',
             'clear': () => { output.innerHTML = ''; stopMatrix(); return null; }
         };
 
@@ -217,7 +241,7 @@
             let response = commands[cmd] ? commands[cmd]() : `Command not found: ${cmd}. Type 'help'.`;
             
             if (response !== null) {
-                output.innerHTML += `<div><span style="color:var(--dim)">$ ${cmd}</span><br>${response}</div>`;
+                output.innerHTML += `<div><span style="color:var(--dim)">&gt; ${cmd}</span><br>${response}</div>`;
                 output.scrollTop = output.scrollHeight;
             }
         }
@@ -233,9 +257,9 @@
             const drops = Array(Math.floor(columns)).fill(1);
 
             function draw() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillStyle = "rgba(11, 15, 23, 0.05)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#00ff41";
+                ctx.fillStyle = "#3b82f6";
                 ctx.font = `${fontSize}px monospace`;
                 for (let i = 0; i < drops.length; i++) {
                     const text = Math.random() > 0.5 ? "0" : "1";
