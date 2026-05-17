@@ -74,6 +74,7 @@
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 1rem;
+            cursor: text;
         }
 
         #terminal-output {
@@ -165,7 +166,7 @@
             <div id="terminal-output">System ready. Type 'help' for console tools.</div>
             <div class="input-line">
                 <span class="prompt">&gt;</span>
-                <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" autofocus aria-label="Console input">
+                <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" aria-label="Console input">
             </div>
         </div>
 
@@ -279,27 +280,3 @@
         }
 
         // 4. GitHub API integration
-        async function fetchLastUpdate() {
-            try {
-                const response = await fetch(`https://api.github.com/repos/andreasrisoy/risoy-website/commits/main`);
-                const data = await response.json();
-                const date = new Date(data.commit.author.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' });
-                statusDisplay.textContent = `Patch: ${date}`;
-            } catch (e) {
-                statusDisplay.textContent = `System: Online`;
-            }
-        }
-
-        // Event Listeners
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                handleCommand(input.value);
-                input.value = '';
-            }
-        });
-
-        document.addEventListener('click', () => input.focus());
-        window.onload = () => { typeWriter(); fetchLastUpdate(); };
-    </script>
-</body>
-</html>
