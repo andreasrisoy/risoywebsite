@@ -99,6 +99,9 @@
             margin-top: 0.5rem; 
             font-size: 0.8rem;
             font-family: "SF Mono", "SFProMono-Regular", Consolas, monospace;
+            border: none;
+            padding: 0;
+            background: transparent;
         }
         .prompt { color: var(--accent); margin-right: 8px; user-select: none; font-weight: bold; }
 
@@ -109,6 +112,8 @@
             font-family: inherit;
             outline: none;
             width: 100%;
+            padding: 0;
+            font-size: 0.8rem;
         }
 
         .verification { 
@@ -164,10 +169,10 @@
 
         <div class="terminal-container">
             <div id="terminal-output">System ready. Type 'help' for console tools.</div>
-            <div class="input-line">
+            <form id="cmd-form" class="input-line">
                 <span class="prompt">&gt;</span>
                 <input type="text" id="cmd-input" spellcheck="false" autocomplete="off" aria-label="Console input">
-            </div>
+            </form>
         </div>
 
         <footer class="verification">
@@ -188,6 +193,7 @@
         // DOM Caching
         const output = document.getElementById('terminal-output');
         const input = document.getElementById('cmd-input');
+        const form = document.getElementById('cmd-form');
         const titleDisplay = document.getElementById("typewriter");
         const statusDisplay = document.getElementById("status-display");
         const canvas = document.getElementById('matrix-canvas');
@@ -280,3 +286,32 @@
         }
 
         // 4. GitHub API integration
+        async function fetchLastUpdate() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/andreasrisoy/risoy-website/commits/main`);
+                const data = await response.json();
+                const date = new Date(data.commit.author.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' });
+                statusDisplay.textContent = `Patch: ${date}`;
+            } catch (e) {
+                statusDisplay.textContent = `System: Online`;
+            }
+        }
+
+        // Form Submit i stedet for Keydown (Sikrer Enter-støtte overalt)
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); // Forhindrer at siden laster på nytt
+            handleCommand(input.value);
+            input.value = '';
+        });
+
+        // Fokuserer kun terminalen ved klikk på desktop
+        document.querySelector('.terminal-container').addEventListener('click', () => {
+            if (!window.matchMedia("(pointer: coarse)").matches) {
+                input.focus();
+            }
+        });
+
+        window.onload = () => { typeWriter(); fetchLastUpdate(); };
+    </script>
+</body>
+</html>
