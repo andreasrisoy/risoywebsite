@@ -1,0 +1,100 @@
+import json
+import os
+import urllib.request
+from datetime import datetime
+
+
+def fetch_weather():
+    # Henter live værdata for Stavanger-regionen (gratis API, ingen nøkkel trengs)
+    url = "https://api.open-meteo.com/v1/forecast?latitude=58.97&longitude=5.73&current=temperature_2m,weather_code"
+    try:
+        with urllib.request.urlopen(url) as response:
+            data = json.loads(response.read().decode())
+            temp = data["current"]["temperature_2m"]
+            return f"{temp}°C"
+    except Exception:
+        return "Kunne ikke hente værdata"
+
+
+def generate_html():
+    # 1. Hent dataene
+    weather_data = fetch_weather()
+    current_time = datetime.now().strftime("%d. %b %Y, %H:%M:%S")
+
+    # 2. Liksom-data for finans (frem til vi kobler på ekte børskurser)
+    oslo_bors = "1 420,50 poeng (+0,45%)"
+    brent_crude = "$82,40"
+
+    # 3. HTML-malen som skal bygges
+    html_content = f"""<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>risoy.io // Dashboard</title>
+    <style>
+        body {{
+            background: #0b0f17;
+            color: #f3f4f6;
+            font-family: -apple-system, sans-serif;
+            padding: 40px 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }}
+        .container {{ width: 100%; max-width: 600px; }}
+        h1 {{ font-size: 1.8rem; margin-bottom: 5px; }}
+        .timestamp {{ color: #9ca3af; font-size: 0.8rem; margin-bottom: 30px; }}
+        .grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }}
+        .card {{
+            background: #111827;
+            border: 1px solid #1f2937;
+            padding: 20px;
+            border-radius: 12px;
+        }}
+        .card-title {{ color: #9ca3af; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }}
+        .card-value {{ font-size: 1.4rem; font-weight: bold; margin-top: 10px; color: #3b82f6; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>risoy.io // Dashboard</h1>
+        <div class="timestamp">Sist oppdatert: {current_time} (UTC)</div>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">Hovedindeksen (OSEBX)</div>
+                <div class="card-value">{oslo_bors}</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Nordsjøolje (Brent)</div>
+                <div class="card-value">{brent_crude}</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Været i Stavanger</div>
+                <div class="card-value">{weather_data}</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Systemstatus</div>
+                <div class="card-value" style="color: #10b981;">Alt OK</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
+    # 4. Sørg for at mappen 'dashboard' eksisterer, og skriv filen
+    os.makedirs("dashboard", exist_ok=True)
+    with open("dashboard/index.html", "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+
+if __name__ == "__main__":
+    generate_html()
