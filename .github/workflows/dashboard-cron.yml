@@ -1,4 +1,8 @@
+# Simple workflow for deploying static content to GitHub Pages
 name: Update Automated Dashboard
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
   schedule:
@@ -12,6 +16,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   update-and-deploy:
     runs-on: ubuntu-latest
@@ -23,6 +31,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+
+      # DETTE STEGET FIKSER FEILMELDINGEN:
+      - name: Install dependencies
+        run: pip install yfinance
 
       - name: Run dashboard script
         run: python build_dashboard.py
