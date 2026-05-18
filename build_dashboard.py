@@ -258,4 +258,161 @@ def generate_html():
             align-items: center;
         }}
         .container {{ width: 100%; max-width: 1000px; }}
-        h1 {{ font-size: 2.2rem; margin: 0 0 5px 0; letter-spacing: -0.5px; font
+        h1 {{ font-size: 2.2rem; margin: 0 0 5px 0; letter-spacing: -0.5px; font-weight: 700; }}
+        .timestamp {{ color: #9ca3af; font-size: 0.8rem; margin-bottom: 40px; }}
+        
+        h2 {{ font-size: 1.1rem; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; margin-top: 40px; margin-bottom: 15px; border-bottom: 1px solid #1f2937; padding-bottom: 5px; }}
+        
+        .grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 15px;
+        }}
+        .grid-wide {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+        }}
+        @media (max-width: 500px) {{ .grid-wide {{ grid-template-columns: 1fr; }} }}
+
+        .card {{
+            background: #111827;
+            border: 1px solid #1f2937;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }}
+        .card-title {{ color: #9ca3af; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }}
+        .card-meta {{ display: flex; align-items: baseline; justify-content: space-between; margin-top: 10px; }}
+        .card-value {{ font-size: 1.4rem; font-weight: bold; color: #ffffff; }}
+        .card-change {{ font-size: 0.85rem; font-weight: 600; }}
+        
+        /* Spesial-lister for Nyheter og Buss */
+        .card-list {{
+            margin: 12px 0 0 0;
+            padding-left: 0;
+            list-style: none;
+            font-size: 0.85rem;
+        }}
+        .card-list li {{
+            padding: 8px 0;
+            border-bottom: 1px solid #1f2937;
+            line-height: 1.4;
+        }}
+        .card-list li:last-child {{ border-bottom: none; }}
+        .card-list a {{ color: #f3f4f6; text-decoration: none; transition: color 0.2s; }}
+        .card-list a:hover {{ color: #3b82f6; }}
+        
+        .line-badge {{
+            background: #1f2937;
+            color: #3b82f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 5px;
+            font-size: 0.75rem;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>risoy.io // Dashboard</h1>
+        <div class="timestamp">Siste robotoppdatering: {current_time} UTC (Hver 6. time)</div>
+        
+        <h2>🕒 Verdensklokke (Live)</h2>
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">Norge (Oslo/Stavanger)</div>
+                <div class="card-meta"><div class="card-value" id="tz-oslo">--:--:--</div></div>
+            </div>
+            <div class="card">
+                <div class="card-title">London (GMT/BST)</div>
+                <div class="card-meta"><div class="card-value" id="tz-london">--:--:--</div></div>
+            </div>
+            <div class="card">
+                <div class="card-title">New York (EST/EDT)</div>
+                <div class="card-meta"><div class="card-value" id="tz-ny">--:--:--</div></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Tokyo (JST)</div>
+                <div class="card-meta"><div class="card-value" id="tz-tokyo">--:--:--</div></div>
+            </div>
+        </div>
+
+        <h2>📈 Oslo Børs & Markedsdata</h2>
+        <div class="grid">
+            {stock_cards_html}
+        </div>
+
+        <h2>💱 Valuta & Krypto</h2>
+        <div class="grid">
+            {fx_cards_html}
+        </div>
+
+        <h2>🌤️ Vær & Hjelpetjenester</h2>
+        <div class="grid">
+            {weather_cards_html}
+            <div class="card">
+                <div class="card-title">⚡ Strømpris nå (Prissone NO2)</div>
+                <div class="card-meta">
+                    <div class="card-value">{strom_now}</div>
+                    <div class="card-change" style="color: #eab308;">Spotpris</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">🌊 Sjøtemp (Sørwestkysten)</div>
+                <div class="card-meta">
+                    <div class="card-value">{sea_temp}</div>
+                    <div class="card-change" style="color: #06b6d4;">Yr/Marine</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">🚀 Mennesker i Verdensrommet</div>
+                <div class="card-meta">
+                    <div class="card-value">{space_now}</div>
+                    <div class="card-change" style="color: #a855f7;">ISS Orbit</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>📋 Informasjonsstrøm</h2>
+        <div class="grid-wide">
+            <div class="card">
+                <div class="card-title">📰 Siste Toppsaker fra NRK</div>
+                <ul class="card-list">
+                    {nrk_html}
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-title">🚏 Sanntidsavganger (Stavanger S)</div>
+                <ul class="card-list">
+                    {entur_html}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateClocks() {{
+            const options = {{ hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }};
+            document.getElementById('tz-oslo').textContent = new Date().toLocaleTimeString('no-NO', {{ ...options, timeZone: 'Europe/Oslo' }});
+            document.getElementById('tz-london').textContent = new Date().toLocaleTimeString('no-NO', {{ ...options, timeZone: 'Europe/London' }});
+            document.getElementById('tz-ny').textContent = new Date().toLocaleTimeString('no-NO', {{ ...options, timeZone: 'America/New_York' }});
+            document.getElementById('tz-tokyo').textContent = new Date().toLocaleTimeString('no-NO', {{ ...options, timeZone: 'Asia/Tokyo' }});
+        }}
+        setInterval(updateClocks, 1000);
+        updateClocks();
+    </script>
+</body>
+</html>
+"""
+
+    os.makedirs("dashboard", exist_ok=True)
+    with open("dashboard/index.html", "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+
+if __name__ == "__main__":
+    generate_html()
